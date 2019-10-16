@@ -1,0 +1,149 @@
+#define a 13
+#define b 10
+#define c 8
+
+int adc_val = analogRead(A0);
+
+
+void setup() {
+  // put your setup code here, to run once:
+  pinMode(A1,OUTPUT);
+  pinMode(A2,OUTPUT);
+  pinMode(A3,OUTPUT);
+  pinMode(A4,OUTPUT);
+  pinMode(A5,OUTPUT);
+  pinMode(13,OUTPUT);
+  pinMode(2,OUTPUT);
+  pinMode(5,OUTPUT);
+  pinMode(6,OUTPUT);
+  pinMode(8,OUTPUT);
+  pinMode(9,OUTPUT);
+  pinMode(10,OUTPUT);
+  Serial.begin(9600);
+}
+
+int leds[5] = {A1,A2,A3,A4,A5};
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  Serial.println(adc_val);
+  int num;
+  for (num=1; ;num++){
+  for (int i = 0 ;i<=4 ;i++){ 
+    digitalWrite(leds[i] , HIGH);
+    delay(500);
+    digitalWrite(leds[i] , LOW);
+    delay(200);
+  }  
+  if(num==10)
+  num=1;  
+  sseg_display(num);
+  }
+} 
+
+void sseg_display(int num){
+ 
+    switch (num){
+
+    case 1:
+    digitalWrite(2 , LOW);
+    digitalWrite(5 , LOW);
+    digitalWrite(6 , HIGH);
+    digitalWrite(8 , HIGH);
+    digitalWrite(9 , HIGH);
+    digitalWrite(10 , HIGH);
+    digitalWrite(13 , HIGH);
+    delay(500);
+    break;
+    
+    case 2:
+    digitalWrite(2 , HIGH);
+    digitalWrite(5 , LOW);
+    digitalWrite(6 , LOW);
+    digitalWrite(8 , HIGH);
+    digitalWrite(9 , LOW);
+    digitalWrite(10 , LOW);
+    digitalWrite(13 , LOW);
+    delay(500);
+    break;
+    
+    case 3:
+    digitalWrite(2 , HIGH);
+    digitalWrite(5 , HIGH);
+    digitalWrite(6 , LOW);
+    digitalWrite(8 , LOW);
+    digitalWrite(9 , LOW);
+    digitalWrite(10 , LOW);
+    digitalWrite(13 , LOW);
+    delay(500);
+    break;
+
+    case 4:
+    digitalWrite(2 , LOW);
+    digitalWrite(5 , HIGH);
+    digitalWrite(6 , HIGH);
+    digitalWrite(8 , LOW);
+    digitalWrite(9 , LOW);
+    digitalWrite(10 , LOW);
+    digitalWrite(13 , HIGH);
+    delay(500);
+    break;
+
+    case 5:
+    digitalWrite(2 , LOW);
+    digitalWrite(5 , HIGH);
+    digitalWrite(6 , LOW);
+    digitalWrite(8 , LOW);
+    digitalWrite(9 , LOW);
+    digitalWrite(10 , HIGH);
+    digitalWrite(13 , LOW);
+    delay(500);
+    break;
+
+    case 6:
+    digitalWrite(2 , LOW);
+    digitalWrite(5 , LOW);
+    digitalWrite(6 , LOW);
+    digitalWrite(8 , LOW);
+    digitalWrite(9 , LOW);
+    digitalWrite(10 , HIGH);
+    digitalWrite(13 , LOW);
+    delay(500);
+    break;
+
+    case 7:
+    digitalWrite(2 , HIGH);
+    digitalWrite(5 , HIGH);
+    digitalWrite(6 , HIGH);
+    digitalWrite(8 , LOW);
+    digitalWrite(9 , HIGH);
+    digitalWrite(10 , LOW);
+    digitalWrite(13 , LOW);
+    delay(500);
+    break;
+
+    case 8:
+    digitalWrite(2 , LOW);
+    digitalWrite(5 , LOW);
+    digitalWrite(6 , LOW);
+    digitalWrite(8 , LOW);
+    digitalWrite(9 , LOW);
+    digitalWrite(10 , LOW);
+    digitalWrite(13 , LOW);
+    delay(500);
+    break;
+
+    case 9:
+    digitalWrite(2 , LOW);
+    digitalWrite(5 , HIGH);
+    digitalWrite(6 , LOW);
+    digitalWrite(8 , LOW);
+    digitalWrite(9 , LOW);
+    digitalWrite(10 , LOW);
+    digitalWrite(13 , LOW);
+    delay(500);
+    break;
+   
+  }
+  
+}
