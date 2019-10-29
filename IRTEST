@@ -1,0 +1,52 @@
+#define IR1 2
+#define IR2 3
+float val1 = 2;
+float val2 = 0;
+float sum1 = 0;
+float sum2 = 0;
+int i = 0;
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+  
+  pinMode(val1, INPUT);
+  pinMode(val2, INPUT);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  val1 = analogRead(IR1)/1023.0*5;
+  val2 = analogRead(IR2)/1023.0*5;
+  sum1 += val1;
+  sum2 += val2;
+  i++;
+  if (i == 50){
+    i = 0;
+    
+    sum1/= 50;
+    Serial.print("Average of val1 is ");
+    Serial.print(sum1);
+    sum2/= 50;
+    Serial.print(" Average of val2 is ");
+    Serial.print(sum2);
+    Serial.print(" Average of valdiff is ");
+    Serial.print(sum1 - sum2);
+    Serial.println("");
+    sum1 = 0;
+    sum2 = 0;
+  }
+   
+  
+  Serial.print("IRL is ");
+  Serial.print(val1);
+  
+  Serial.print(" IRR is ");
+  Serial.print(val2);
+  Serial.print(" Diff is: ");
+  Serial.print(val1-val2);
+  Serial.println("");
+  delay(100); 
+}
+/* Red is right of the robot
+ Blue is left of the robot*/
