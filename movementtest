@@ -1,0 +1,80 @@
+/*#include "MeOrion.h" */
+#include "MeMCore.h"
+#include "math.h"
+
+MeDCMotor motor1(M1);
+MeDCMotor motor2(M2);
+MeUltrasonicSensor ultraSensor(PORT_1);
+
+void turnLeft();
+void turnRight();
+void motorStop();
+void realign();
+void straight();
+
+void setup() {
+  int color = 1;
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+  /*while(ultraSensor.distanceCm() > 5){*/
+  while(1){
+    straight();
+    if (ultraSensor.distanceCm() <= 5){
+      if (color == 1){
+        turnRight();
+        delay(609);
+      }
+    }
+  }
+  Serial.println(millis());
+  motorStop();
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+ /* Serial.print("Distance : ");
+  Serial.print(ultraSensor.distanceCm() );
+  Serial.println(" cm");
+  delay(100); */
+}
+
+void straight(){
+  motor1.run(-100);
+  motor2.run(100);
+}
+
+void turnLeft() {
+  motor1.run(100);
+  motor2.run(100);
+}
+
+void turnRight() {
+  motor1.run(-100);
+  motor2.run(-100);
+}
+
+void motorStop() {
+  motor1.stop();
+  motor2.stop();
+}
+/*
+void realign() {
+  while ( fabs(left - right) >= something) {
+    if ( (left - right) < 0) {  /* if right wall is closer 
+      turnLeft();
+    }
+    if ( (left - right) > 0) {  /* if left wall is closer 
+      turnRight();
+    }
+  }
+} */
+
+void realign() {
+  int t = 0;
+  while (1) {
+    turnLeft();
+    if (millis() > 1500) {
+      break;
+    }
+  }
+}
