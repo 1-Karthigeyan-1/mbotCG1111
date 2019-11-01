@@ -1,5 +1,11 @@
-//Define pins
+/*************************************
+Progress Tracker:
+1. Skeleton code
+2. Movement direction 3/5
+**************************************/
 
+
+#include <MeMCore.h>
 
 //Define robot states
 #define LEFT 1
@@ -10,13 +16,17 @@
 #define STRAIGHT 4
 
 //Color code states, may not be needed
-#define BLACK -1
-#define RED 1
-#define GREEN 2
-#define LIGHTBLUE 3
-#define PURPLE 4
-#define YELLOW 5
-#define NOCOLOR 0
+#define USDIST 300
+
+//Define ports
+MeLineFollower lineFinder(PORT_3); /* Line Finder module can only be connected to PORT_3, PORT_4, PORT_5, PORT_6 of base shield. */
+MeDCMotor motor1(M1);
+MeDCMotor motor2(M2);
+MeUltrasonicSensor ultraSensor(PORT_1);
+
+//Define pins
+
+//Function prototypes
 
 
 
@@ -26,18 +36,21 @@ void setup()
   executeRobot();
 }
 
+
 void executeRobot()
 {
   //Boolean flag 
-  int victory = 0;
-  movement(STRAIGHT):      
+  int victory = 0;     
   while (victory == 0)
   {
-    if ((checkFront() != STRAIGHT) || (checkSide() != STRAIGHT))
+    if ((checkSide() != STRAIGHT) || (checkFront() < USDIST))
     {
+      movement(SLOW);
       movement(REORIENTATE);
     }
-
+    
+    movement(STRAIGHT): 
+    
     if ((checkStrip == 1)
     {
       movement(STOP);
@@ -89,55 +102,99 @@ int checkChallenge()
     //Checks for the type of challenge in place.
     if(checkColor() == BLACK)
     {
-      movement(checkSound);
-      return 0;
-    }
-    else if(checkColor() == NOCOLOR)
-    {
-      return 1;
+      if (checkSound() == 0);
+      {
+        return 1;
+      }  
+      else 
+      {
+        movement(checkSound());
+      }
     }
     else
     {
       movement(checkColor);
     }
   }
+  return 0;
 }
+
+
+int checkSound()
+{
+  if ()// Frequency is between 100 to 300 Hz
+  {
+    return LEFT;
+  }
+
+  else if()// Frequency is above 3000 Hz
+  {
+    return RIGHT
+  }
+
+  else
+  {
+    return 0;
+  }
+}
+
 
 int checkStrip()
 {
-  //Line sensor checks for black strip.
+  //Line sensor checks for black strip. 
+  int sensorState = lineFinder.readSensors();
+  if (sensorState)
+  {
+    switch(sensorState)
+    {
+      case S1_IN_S2_IN: 
+      case S1_IN_S2_OUT: 
+      case S1_OUT_S2_IN: return 1;               
+      break;
+      default: return 0;
+      break;
+    }
 }
+
 
 void movement(int state)
 {
   switch(state)
   {
-    case FRONT:
+    case LEFT: motor1.run(100);
+               motor2.run(100);
     break;
-    case LEFT: 
+    case RIGHT: motor1.run(-100);
+                motor2.run(-100);
     break;
-    case RIGHT:
+    case ABOUTTURN: motor1.run(200);
+                    motor2.run(200);
     break;
-    case ABOUTTURN:
-    break;
-    case STOP:
+    case STOP: motor1.stop();
+               motor2.stop();
     break; 
-    case STRAIGHT:
+    case STRAIGHT: motor1.run(-100);
+                   motor2.run(100);
     break;
   }
 }
+
 
 int checkStraight()
 {
   if(checkIR == STRAIGHT)
   {
-    return 1;
+    return STRAIGHT;
   }
   else
   {
     while(checkIR != STRAIGHT) 
+    {
+      
+    }
   }
 }
+
 
 int checkColor()
 {
@@ -146,3 +203,8 @@ int checkColor()
   //If it is of any other color, robot moves according to the color.
   //If color detected is neither of the colors, proceed to play victory tune.
 }
+
+
+
+
+
