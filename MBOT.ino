@@ -2,6 +2,9 @@
 Progress Tracker:
 1. Skeleton code
 2. Movement direction 3/5
+
+Find your functions are code on a seperate file your function 
+with the appropriate return values
 **************************************/
 
 
@@ -43,13 +46,7 @@ void executeRobot()
   int victory = 0;     
   while (victory == 0)
   {
-    if ((checkSide() != STRAIGHT) || (checkFront() < USDIST))
-    {
-      movement(SLOW);
-      movement(REORIENTATE);
-    }
-    
-    movement(STRAIGHT): 
+    movement(STRAIGHT):
     
     if ((checkStrip == 1)
     {
@@ -173,7 +170,7 @@ void movement(int state)
     case STOP: motor1.stop();
                motor2.stop();
     break; 
-    case STRAIGHT: motor1.run(-100);
+    case STRAIGHT: motor1.run(-100);  //Incorporate IR and US here!
                    motor2.run(100);
     break;
   }
@@ -201,7 +198,7 @@ int checkColor()
   //Detects the color of the board above
   //If it is black, return soundChallenge flag. Robot remains stationary.
   //If it is of any other color, robot moves according to the color.
-  //If color detected is neither of the colors, proceed to play victory tune.
+  //If color detected is neither of the colors, proceed to return false flag
 }
 
 
