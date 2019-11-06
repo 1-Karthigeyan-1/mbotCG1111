@@ -1,6 +1,5 @@
 #define MICBP 4
 #define MICHP 3
-#define tuneTime 400
 
 void setup() {
   // put your setup code here, to run once:
@@ -18,6 +17,7 @@ void loop(){
   sound();
   delay(100);
 }
+
 void sound() {
   float valBP;
   float valHP;
@@ -26,7 +26,7 @@ void sound() {
   float diff=0;
   
   
-  while(count < 600){
+  while(count < 600){ //I set it to run for around 3 seconds to sample at least the whole duration of one song cycle of each song
       valBP = analogRead(MICBP)/1023.0*5;
       valHP = analogRead(MICHP)/1023.0*5;
     if (valBP > maxBP){
@@ -44,15 +44,19 @@ void sound() {
   }
   if((maxBP - maxHP) > 0.15){
     Serial.println("Frequency is 100 to 300!");
+    //movement(LEFT);
     
   }
   else if ((maxHP - maxBP) > 0.15){
     Serial.println("Frequency is above 3000!");
+    //movement(right);
   }
   else{
     Serial.println("Your mom is gay");
+    return 0;
   }
-  Serial.print("Voltage of sumBP: "); Serial.print(maxBP); Serial.print("  "); //BP
-  Serial.println("Voltage of sumHP: "); Serial.print(maxHP); Serial.print("  "); //BP
-  Serial.println("Voltage of diff: "); Serial.print(maxBP - maxHP); Serial.print("  "); //BP
+  Serial.print("Voltage of sumBP: "); Serial.print(maxBP); Serial.print("  "); 
+  Serial.println("Voltage of sumHP: "); Serial.print(maxHP); Serial.print("  "); 
+  Serial.println("Voltage of diff: "); Serial.print(maxBP - maxHP); Serial.print("  ");
+  return 1;
 }
