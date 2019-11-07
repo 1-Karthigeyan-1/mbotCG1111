@@ -47,15 +47,15 @@ void executeRobot()
   while (victory == 0)
   {
     movement(STRAIGHT):
-    
+
     if ((checkStrip == 1)
     {
       movement(STOP);
-        if (checkChallenge() == 1)
+        if (checkChallenge())
         {
           victory = 1;
         }
-        else
+        /*else
         {
           movement(REORIENTATE);
         }
@@ -64,11 +64,11 @@ void executeRobot()
       {
         movement(REORIENTATE);
       }
-    }
+    }*/
     
     if (victory == 1)
     {
-      exit(0);
+      break;;
     }
   }
   playVictory();
@@ -91,11 +91,7 @@ int checkSide()
 }
 
 
-int checkChallenge()
-{
-  //Line sensor checks for black strip
-  if(checkStrip() == 1)
-  {
+int checkChallenge() {
     //Checks for the type of challenge in place.
     if(checkColor() == BLACK)
     {
@@ -170,14 +166,15 @@ void movement(int state)
     case STOP: motor1.stop();
                motor2.stop();
     break; 
-    case STRAIGHT: motor1.run(-100);  //Incorporate IR and US here!
-                   motor2.run(100);
+    case UTURN: movement_UTURN();
+    break;
+    case STRAIGHT: movement_straight();  //Incorporate IR and US here!       
     break;
   }
 }
 
 
-int checkStraight()
+/*int checkStraight()
 {
   if(checkIR == STRAIGHT)
   {
@@ -190,7 +187,7 @@ int checkStraight()
       
     }
   }
-}
+}*/
 
 
 int checkColor()
