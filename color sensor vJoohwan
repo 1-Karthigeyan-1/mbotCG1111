@@ -1,0 +1,149 @@
+#include "MeMCore.h"
+
+// #define LDR some pin number
+// #define LED some pin number
+MeRGBLed led(7, 2);
+MeLightSensor lightSensor(6);
+
+int getAvr(int times);
+
+float whiteArr[3]; // R: 616.00 G: 464.00 B: 477.00
+float blackArr[3]; // R: 170.00 G: 121.00 B: 133.00
+float greyDiff[3]; // R: 446.00 G: 343.00 B: 344.00
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+
+  int i;
+  Serial.println("White calibration...");
+  delay(5000);
+  led.setColor(0, 255, 0, 0);  //white calibration start
+  led.show();
+  delay(200);
+  whiteArr[0] = getAvr(7);
+  led.setColor(0, 0, 255, 0);
+  led.show();
+  delay(200);
+  whiteArr[1] = getAvr(7);
+  led.setColor(0, 0, 0, 255);
+  led.show();
+  delay(200);
+  whiteArr[2] = getAvr(7);     //white calibration end
+  Serial.print("White -> R: ");
+  Serial.print(whiteArr[0]);
+  Serial.print(" G: ");
+  Serial.print(whiteArr[1]);
+  Serial.print(" B: ");
+  Serial.println(whiteArr[2]);
+  led.setColor(0, 0, 0, 0);
+  led.show();
+  Serial.println("Black calibration..."); //black calibration start
+  delay(5000);
+  led.setColor(0, 255, 0, 0);
+  led.show();
+  delay(200);
+  blackArr[0] = getAvr(7);
+  led.setColor(0, 0, 255, 0);
+  led.show();
+  delay(200);
+  blackArr[1] = getAvr(7);
+  led.setColor(0, 0, 0, 255);
+  led.show();
+  delay(200);
+  blackArr[2] = getAvr(7);     //black calibration end
+  Serial.print("black -> R: ");
+  Serial.print(blackArr[0]);
+  Serial.print(" G: ");
+  Serial.print(blackArr[1]);
+  Serial.print(" B: ");
+  Serial.println(blackArr[2]);
+
+  for (i = 0; i < 3; i++) {
+    greyDiff[i] = whiteArr[i] - blackArr[i];
+  }
+  Serial.print("greyDiff -> R: ");
+  Serial.print(greyDiff[0]);
+  Serial.print(" G: ");
+  Serial.print(greyDiff[1]);
+  Serial.print(" B: ");
+  Serial.println(greyDiff[2]);
+
+  /*whiteArr[0] = 616;                   these are calibration values from our table
+    whiteArr[1] = 464;
+    whiteArr[2] = 477;
+    blackArr[0] = 170;
+    blackArr[1] = 121;
+    blackArr[2] = 133;
+    for (i = 0; i < 3; i++) {
+    greyDiff[i] = whiteArr[i] - blackArr[i];
+    } */
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  int colorArr[3];
+
+  //get color values
+  led.setColor(0, 255, 0, 0);
+  led.show();
+  delay(200);
+  colorArr[0] = ( (getAvr(7) - blackArr[0]) / greyDiff[0] ) * 255;
+  led.setColor(0, 0, 255, 0);
+  led.show();
+  delay(200);
+  colorArr[1] = ( (getAvr(7) - blackArr[1]) / greyDiff[1] ) * 255;
+  led.setColor(0, 0, 0, 255);
+  led.show();
+  delay(200);
+  colorArr[2] = ( (getAvr(7) - blackArr[2]) / greyDiff[2] ) * 255;
+
+  Serial.print("R: ");
+  Serial.print(colorArr[0]);
+  Serial.print(" G: ");
+  Serial.print(colorArr[1]);
+  Serial.print(" B: ");
+  Serial.println(colorArr[2]);
+  led.setColor(0, 0, 0, 0);
+  led.show();
+
+  if (colorArr[0] < 5 && colorArr[1] < 5 && colorArr[2] < 5) { //if all values small, black
+    Serial.println("black");
+  } else {
+    if (colorArr[1] > colorArr[2] && colorArr[1] > colorArr[0]) {//if green highest, green
+      Serial.println("green");
+    }
+
+    if (colorArr[0] > colorArr[1] && colorArr[0] > colorArr[2]) { //if red is highest value,
+      if (abs(colorArr[1] - colorArr[2]) < 11) {                  //if green and blue similiar, red
+        Serial.println("red");
+      } else {
+        Serial.println("yellow");                                //if not, yellow
+      }
+    }
+
+    if (colorArr[2] > colorArr[1] && colorArr[2] > colorArr[0]) { //if blue is highest
+      if (colorArr[0] > colorArr[1]) {
+        Serial.println("purple");                                //if red higher than green, purple
+      }
+      if (colorArr[1] > colorArr[0]) {                           //if green higher than red, light blue
+        Serial.println("light blue");
+      }
+    }
+  }
+  delay(200);
+
+
+}
+
+int getAvr(int times) {
+  int i;
+  int sum = 0;
+  int reading;
+  int avr;
+  for (i = 0; i < times; i++) {
+    reading = lightSensor.read();
+    sum = sum + reading;
+  }
+  avr = sum / i;
+  return avr;
+}
