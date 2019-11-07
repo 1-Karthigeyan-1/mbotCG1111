@@ -1,7 +1,21 @@
   /*************************************
 Progress Tracker:
 1. Skeleton code
-2. Movement direction 3/5
+2. Movement direction 5/5
+3. Color sensing 4/5
+4. Sound sensing 4/5
+5. IR sensing 4/5
+
+Tasks:
+1. Obtain accurate environmental color calibration values
+2. Clear IR sensing
+3. Rewrite code for sound sensor/ replace resistors
+4. Add supporting structures to MBOT
+  a. Tie up wires
+  b. Support structure for mic
+  c. Fix IR sensor position
+  d. Program victory tune
+
 
 Find your functions are code on a seperate file your function 
 with the appropriate return values
@@ -11,14 +25,14 @@ with the appropriate return values
 #include <MeMCore.h>
 
 //Define robot states
+#define STOP 0
 #define LEFT 1
 #define RIGHT 2
 #define ABOUTTURN 3 
 #define UTURN_LEFT 4
 #define UTURN_RIGHT 5
-#define REORIENTATE -1
-#define STOP 0
 #define STRAIGHT 6
+
 
 //Miscellaneous definitions
 #define USDIST 4
@@ -127,10 +141,6 @@ int checkChallenge() {
 }
 
 
-
-
-
-
 int checkSound()
 {
   float valBP;
@@ -208,10 +218,10 @@ void movement(int state)
                 movement_straight();
                 delay(TIME);
     break;
-    case ABOUTTURN: motor1.run(200);
-                    motor2.run(200);
+    case ABOUTTURN: motor1.run(100);
+                    motor2.run(100);
                     movement_straight();
-                    delay(TIME);
+                    delay(2*TIME);
     break;
     case STOP: motor1.stop();
                motor2.stop();
