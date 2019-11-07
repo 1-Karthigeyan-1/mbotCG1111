@@ -1,13 +1,3 @@
-/*************************************
-Progress Tracker:
-1. Skeleton code
-2. Movement direction 3/5
-
-Find your functions are code on a seperate file your function 
-with the appropriate return values
-**************************************/
-
-
 #include <MeMCore.h>
 
 //Define robot states
@@ -26,6 +16,8 @@ MeLineFollower lineFinder(PORT_3); /* Line Finder module can only be connected t
 MeDCMotor motor1(M1);
 MeDCMotor motor2(M2);
 MeUltrasonicSensor ultraSensor(PORT_1);
+MeRGBLed led(7,2);
+MeLightSensor lightSensor(6);
 
 //Define pins
 
@@ -46,16 +38,22 @@ void executeRobot()
   int victory = 0;     
   while (victory == 0)
   {
-    movement(STRAIGHT):
-
+    if ((checkSide() != STRAIGHT) || (checkFront() < USDIST))
+    {
+      movement(SLOW);
+      movement(REORIENTATE);
+    }
+    
+    movement(STRAIGHT): 
+    
     if ((checkStrip == 1)
     {
       movement(STOP);
-        if (checkChallenge())
+        if (checkChallenge() == 1)
         {
           victory = 1;
         }
-        /*else
+        else
         {
           movement(REORIENTATE);
         }
@@ -64,11 +62,11 @@ void executeRobot()
       {
         movement(REORIENTATE);
       }
-    }*/
+    }
     
     if (victory == 1)
     {
-      break;;
+      exit(0);
     }
   }
   playVictory();
@@ -91,7 +89,11 @@ int checkSide()
 }
 
 
-int checkChallenge() {
+int checkChallenge()
+{
+  //Line sensor checks for black strip
+  if(checkStrip() == 1)
+  {
     //Checks for the type of challenge in place.
     if(checkColor() == BLACK)
     {
@@ -166,16 +168,16 @@ void movement(int state)
     case STOP: motor1.stop();
                motor2.stop();
     break; 
-    case UTURN: movement_UTURN();
-    break;
-    case STRAIGHT: movement_straight();  //Incorporate IR and US here!       
+    case STRAIGHT: motor1.run(-100);
+                   motor2.run(100);
     break;
   }
 }
 
 
-/*int checkStraight()
+int checkStraight()
 {
+  int val = analogRead
   if(checkIR == STRAIGHT)
   {
     return STRAIGHT;
@@ -187,7 +189,7 @@ void movement(int state)
       
     }
   }
-}*/
+}
 
 
 int checkColor()
@@ -195,10 +197,5 @@ int checkColor()
   //Detects the color of the board above
   //If it is black, return soundChallenge flag. Robot remains stationary.
   //If it is of any other color, robot moves according to the color.
-  //If color detected is neither of the colors, proceed to return false flag
+  //If color detected is neither of the colors, proceed to play victory tune.
 }
-
-
-
-
-
