@@ -147,6 +147,11 @@ void start_calibration()  {
 }
 //based on Black(212,156,161) White(556,457,476) greydiff(344,301,315)
 int check_colour(){
+  if (colourArray[0] < 20 && colourArray[1] < 20 && colourArray[2] < 20){
+    Serial.println("Black");
+    return 0;
+  }
+  
   if (colourArray[1] > colourArray[0] && colourArray[1] > colourArray[2]){
     Serial.println("Green");
     return 1;
@@ -166,9 +171,14 @@ int check_colour(){
     Serial.println("Purple");
     return 4;
   }
-  
-  else{
+
+  if (colourArray[1] > colourArray[0] && colourArray[2] > colourArray[1]){
     Serial.println("Light Blue");
     return 5;
+  }
+  
+  else{
+    Serial.println("False");
+    return 6;
   }
 }
