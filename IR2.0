@@ -1,0 +1,118 @@
+/*#include "MeOrion.h" */
+#include "MeMCore.h"
+#include "math.h"
+
+
+MeDCMotor motor1(M1);
+MeDCMotor motor2(M2);
+MePort IR(PORT_3);
+
+
+void turnLeft();
+void turnRight();
+void motorStop();
+void realign();
+void straight();
+void IR_Sensor();
+
+void setup() {
+  /*int color = 1;
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+  /*while(ultraSensor.distanceCm() > 5){ 
+  while(1){
+    straight();
+    if (ultraSensor.distanceCm() <= 5){
+      if (color == 1){
+        turnRight();
+        delay(609);
+      }
+    }
+  }
+  Serial.println(millis());
+  motorStop(); */
+ Serial.begin(9600);
+  //straight();
+ loop();
+}
+
+void loop() {
+  straight();
+  delay(25);
+  IR_Sensor();
+ /* if (IR_Sensor() > 0.15 ) {
+    motor1.run(-100);
+    motor2.run(50);
+    delay(10);
+  }
+  else if (IR_Sensor() < -0.10) {
+    motor1.run(-50);
+    motor2.run(100);
+    delay(25);
+  }
+  if ((IR_Sensor() >= -0.15) && (IR_Sensor() <= 0.15)) {
+    straight();
+    delay(10);8 */
+} 
+
+
+  
+  
+void backwards(){
+  motor1.run(100);
+  motor2.run(-100);
+}
+void straight(){
+  motor1.run(-100);
+  motor2.run(100);
+}
+
+void turnLeft() {
+  motor1.run(-25);
+  motor2.run(100);
+}
+
+void turnRight() {
+  motor1.run(-100);
+  motor2.run(25);
+}
+
+void motorStop() {
+  motor1.stop();
+  motor2.stop();
+}
+
+
+
+
+void IR_Sensor(){
+  float val1;
+  float val2;
+  float diff;
+
+  // put your main code here, to run repeatedly:
+  val1 = (IR.aRead1()/1023.0*15); //BLUE // left
+  Serial.print(val1);
+  Serial.print(",");
+  val2 = IR.aRead2()/1023.0*15; //RED // RIGHT
+  Serial.print(val2);
+  Serial.print(",");
+  diff = val1 - val2;
+  Serial.println(diff);
+  if(diff > 0.20){    //val1 > 13.60
+    turnRight();
+    delay(25);
+  }
+  else if(diff < -0.25){   //val2 > 13.35
+    turnLeft();
+    delay(25);
+  }
+  
+    
+}
+   
+  
+
+
+/* Red is right of the robot
+ Blue is left of the robot*/
