@@ -79,21 +79,21 @@ MeBuzzer buzzer;                          //Speaker Port
 
 
 /*________Function Prototypes_________*/
-void movement(int state);                 //Takes in movmentState and moves accordingly
-int checkChallenge();                   //checks for challenhe
-int checkSound();                       //checks for sound
-int checkStrip();                       //checks for black strip
-int check_side();                       //Uses IR snesors to check side
-void movement(int state);               //Checks movementstate
-void readColor();                       //reads color values
-int getAvr(int times);
-int checkColor(float colorArr[]);       
-void colorCalibrate();                  //Calibrates colours
-void movement_straight_nc();               //Moves Straight with side Checking
-void movement_uturn_left();
+void executeRobot(float [], int);        
+void movement(int);                       
 void movement_uturn_right();
-void playVictory();                     //Plays Victory Song
-void executeRobot(float colorArr[], int );      //MAIN FUNCTION
+void movement_uturn_left();
+void movement_straight_nc(); 
+int check_side(); 
+int checkChallenge();                  
+int checkSound();                      
+int checkStrip();                                        
+void readColor();                       
+int checkColor(float colorArr[]);       
+void colorCalibrate();                 
+void playVictory();                    
+int getAvr(int);
+void colorCalibrate();    
 void loop();
 
 
@@ -252,7 +252,7 @@ void movement_straight_nc() {
 
 }
 
-//Use IR sensor to check for sides 
+/*__________________IR sensor________________*/
 int check_side(){
   float Leftval;                               //Left IR
   float Rightval;                              //Right IR
