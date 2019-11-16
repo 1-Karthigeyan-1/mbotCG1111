@@ -7,16 +7,15 @@
 #define ABOUTTURN 3               //180 degree turn on the spot
 #define UTURN_LEFT 4              //Uturns by using 2 left 90-degree turns over 2 grids
 #define UTURN_RIGHT 5             //Uturns by using 2 right 90-degree turns over 2 grids
-#define STOP 0                    // Stops moving
+#define STOP 0                    //Stops moving
 #define STRAIGHT 6                //Moves straight
 #define LEFT_ADJUST 7             //Adjust to the left side in a straight pathway
 #define RIGHT_ADJUST 8            //Adjust to the right side in a straight pathway
-#define BACK 10                   //Move backwards
 
 //Miscellaneous definitions
 #define USDIST 6                  //UltraSonic sensor distance                 
 #define TIME 630                  //time delay for turning 90 degrees
-#define LDRWait 100               //
+#define LDRWait 300               //Response time of the LDR
 #define IRLEFT 15.7               //Left IR threshold
 #define IRRIGHT 13.2              //Right IR threshold
 #define BP_threshold 0.3          //Bandpass threshold
@@ -99,82 +98,88 @@ void loop();
 
 void setup(){
   //Initialzation
-  float colorArr[3] = {0};                 //Colour values are stoered in an array
+  float colorArr[3] = {0};                 //Colour values are stored in an array
   int Victory = 0;                         //Victory is state of maze                                             
   
-  executeRobot(colorArr,Victory);
+  executeRobot(Victory);                   //The function is put here instead of loop() so that the executed run can end.
 }
+
 
 /*________________Main_Function______________*/
-void executeRobot(float colorArr[],int Victory){
+// Recursive function that takes in the int Victory boolean flag value as the parameter
+// And calls upon itself repeatedly until the termination condition is fulfilled
+// whereby int Victory = 1.
+
+void executeRobot(int Victory){
+  float colorArr[3] = {0};                 
   
-  if (Victory == 0){
+  if (Victory == 0){                       //If boolean flag for end of run reads false
     
-    movement_straight_nc();
-    movement(STOP);
-    delay(TIME);
+    movement_straight_nc();                //mBOT will move straight in a while loop, with upon termination executes the next statement.
+    movement(STOP);                        
     
-    if (checkChallenge(colorArr)){
-      Victory = 1;
+    if (checkChallenge(colorArr)){         //If the end-maze condition is fulfilled after executing the challenges in checkChallenge()
+      Victory = 1;                         //Set boolean flag for end of run to positive
     }
     
-    return executeRobot(colorArr,Victory);
+    return executeRobot(Victory);         //Calls upon itself as long as boolean flag reads negative to such that next iteration of movement can be executed
   }
   
-  else{
-    movement(STOP);
-    playVictory();
+  else{                                   //Else if boolean flag reads negative and the maze has ended    
+    movement(STOP);                       //Robot to stop moving
+    playVictory();                        //Plays victory tune
   }
   
 }
-
 
 
 /*____________Movement_Functions__________________*/
+//Repository function of possible challenge moves for the mBOT
+//to execute at a challenge waypoint. 
+//Can be called upon throughout different points along the code
+//to execute movement of the robot.
+
 void movement(int state){
-  switch (state){
+  int time = millis();                  //Set int time to current run time of the code 
+  switch (state){                       //Executes different movements depending on predefined constants in function parameter
     
     //Turn left 90 degress
-    case LEFT_90:                          
-      motor1.run(100);
-      motor2.run(100);
-      delay(TIME);
-      movement_straight_nc();
+    case LEFT_90:                       
+      do{
+        motor1.run(100);
+        motor2.run(100);
+      }while((millis() - time) <= TIME);  //To ensure that the time taken for the turn is as precise as possible. 
       break;
     
     //Turn Right 90 degrees
-    case RIGHT_90: 
-      motor1.run(-100);
-      motor2.run(-100);
-      delay(TIME);
-      movement_straight_nc();
+    case RIGHT_90:
+      do{
+        motor1.run(-100);
+        motor2.run(-100);
+      }while((millis() - time) <= TIME);
       break;
       
-    //Turns 10 degrees on the spot  
+    //Turns 180 degrees on the spot  
     case ABOUTTURN:
-      motor1.run(200);
-      motor2.run(200);
-      delay(TIME - 30);
-      movement_straight_nc();
+      do{
+        motor1.run(200);                  //The robot executes an about turn by doubling motor speed of turn for the same amount of time.
+        motor2.run(200);
+      }while((millis() - time) <= TIME);
       break;
       
     //Stop
     case STOP: 
-      motor1.stop(
+      motor1.stop();
       motor2.stop();
       break;
     
     //2 successive left turns over 2 grids    
-    case UTURN_LEFT: 
-      Serial.println("Uturn Left");
-      movement(BACK);
-      movement_uturn_left();
+    case UTURN_LEFT:
+      movement_uturn_left();             //Called upon as a secondary function due to relative complexity of the code
       break;
         
     //2 successive right turns over 2 grids 
     case UTURN_RIGHT: 
-      Serial.println("Uturn Right");
-      movement(BACK);
       movement_uturn_right();
       break;
         
@@ -185,7 +190,7 @@ void movement(int state){
       break;
         
     //Adjust to the right    
-    case RIGHT_ADJUST:
+    case RIGHT_ADJUST:                  //LEFT_ADJUST and RIGHT_ADJUST are executed in movement_straight_nc() to reorientate the mBOT to the center of the track.
       motor1.run(-100);
       motor2.run(40);
       break;
@@ -195,69 +200,71 @@ void movement(int state){
       motor1.run(-60);
       motor2.run(100);
       break;
-        
-    case BACK:
-      motor1.run(100);
-      motor2.run(-100);
-      delay(20);
-      break;
 
   }
 }
-        
+  
+
 //Does 2 successive 90 degree right turns over 2 grids        
 void movement_uturn_right() {
-  movement(RIGHT_90);
-  delay(TIME);
-  movement(STOP);
-  delay(TIME);
-  
-  while (ultraSensor.distanceCm() > USDIST) {         //Detects for wall 
-    Serial.println(ultraSensor.distanceCm());
-    motor1.run(-100);
+  do{
+    movement(RIGHT_90);                               //Executes the first turn
+  }while((millis() - time) <= 20);                    
+    movement(STOP);                             
+  while (ultraSensor.distanceCm() > USDIST) {         //While distance between mBOT and the wall is greater than threshold value
+    motor1.run(-100);                                 //mBOT will move straight towards the front wall
     motor2.run(100);
-    movement(check_side());
+    movement(check_side());                           //mBOT movement will be corrected by side IR proximity sensors
   }
-    movement(STOP);
-    movement(RIGHT_90);
-    delay(TIME);
-    movement(STRAIGHT);
+    movement(STOP);                                   //When distance is equal to threshold distance, the mBOT will stop before collision
+  
+  do{                                                 //mBOT executes the second right turn. Thereafter, the next iteration of the executeRobot() will be called upon and it will move straight.
+    movement(RIGHT_90);         
+  }while((millis() - time) <= 20);
+  
 }
+
 
 //Does 2 successive 90 degree leftturns over 2 grids        
 void movement_uturn_left() {
-  movement(LEFT_90);
-  delay(TIME);
-  movement(STOP);
-  delay(TIME);
+  do{
+    movement(LEFT_90);
+  }while((millis() - time) <= 20);
+    movement(STOP);
   
   while (ultraSensor.distanceCm() > USDIST) {       //Detects for wall
-    Serial.println(ultraSensor.distanceCm());
     motor1.run(-100);
     motor2.run(100);
     movement(check_side());
   }
     movement(STOP);
+  
+  do{
     movement(LEFT_90);
-    delay(TIME);
-    movement(STRAIGHT);
+  }while((millis() - time) <= 20);
 }
 
-//Moves straight when theres no challenge
+
+//mBOT moves straight while checking for strip to execute checkChallenge()
+//If black strip is detected, while loop is terminated 
 void movement_straight_nc() {  
   while(checkStrip() != 1){                   //checks for black strips along the way.
      movement(check_side());                  //Chwcks the sides and adjust accordingly
      delay(25);
   }
-
 }
 
+
 /*__________________IR sensor________________*/
+//Function to reorientate the mBOT throughout its movement
+//Such that it remains at the center of the track with minimal deviation from the front 
+//in its direction of travel.
+
 int check_side(){
   float Leftval;                               //Left IR
   float Rightval;                              //Right IR
   
-  Leftval = IR.aRead1()/1023.0*15 + 2; 
+  Leftval = IR.aRead1()/1023.0*15;         
   Rightval = IR.aRead2()/1023.0*15; 
  
   if(Leftval > IRLEFT){                         //If left IR exceed threshold value
@@ -269,7 +276,7 @@ int check_side(){
   }
   
   else{                                         
-    return STRAIGHT;
+    return STRAIGHT;                      
   }
   //IR sensors to check if the robot is equidistant to two parallel sides of the walls.
   //A left negotiation is represented by a positive value, a right negotiation is represented by a negative value.
@@ -277,51 +284,54 @@ int check_side(){
 }
 
 
-
 /*_________________Challenge__Checking_____________*/
+//Executes the appropriate actions of the robot depending
+//on the stimulus detected at the challenge waypoint.
+
 int checkChallenge(float colorArr[]) {
   int color, sound;
   
-  readColor(colorArr);                    //Reads colour , and return its values                        
+  readColor(colorArr);                    //Reads colour , and return its values  
   color = checkColor(colorArr);           //Checks what colour category the values are in 
   
-  //If the colour is black , check for sound
-  if (color == 0){                         
+  if (color == 0){                        //If the colour is black , check for sound                    
     sound = checkSound();
     
-    if (sound == 0){
-      return 1;
+    if (sound == 0){                      //If no music is detected
+      return 1;                           //In executeRobot(), the boolean flag int Victory will be set to positive
     }
     
     else{
-      //Moves accordingly with type of sound
-      movement(sound);                        
+      movement(sound);                    //Moves accordingly with type of sound                 
     }
   }
   
-  else{
-    //Moves accordinglty with non-black color
-    movement(color);
+  else{                                   //If color is not black
+    movement(color);                      //Moves according to the color detected
   }
-  return 0;
+  return 0;                               //In executeRobot(), the boolean flag int Victory will be set to negative
 }
 
 
 
 /*_________Sound_checking_____________*/
+//Compares output voltages from the active band pass filter and active high pass filter
+//Against their respective threshold values
+//And returns the appropriate integer value that corresponds with the correct direction of turn
+//depending on frequency of audio played.
+
 int checkSound()
 {
   Serial.println("Checking Sound");
   float valBP;                        //Bandpass valuw
   float valHP;                        //Highpass value
-  float maxBP = 0, maxHP = 0;
-  int count = 0;
+  float maxBP = 0, maxHP = 0;         
   float diff = 0;
+  int time = millis();
 
-  //run for around 3 seconds to sample at least the whole duration of one song cycle of each song
-  while (count < 300) { 
+  while (millis() - time < 3000) {            //Run for around 3 seconds to sample at least the whole duration of one song cycle of each song
     
-    valBP = Sound.aRead1()/ 1023.0 * 5;       //Get low pass values  
+    valBP = Sound.aRead1()/ 1023.0 * 5;       //Get band pass values  
     valHP = Sound.aRead2()/ 1023.0 * 5;       //Get high pass values
     
     if (valBP > maxBP) {                      //Finds the maximum bandpass value
@@ -332,8 +342,6 @@ int checkSound()
       maxHP = valHP;                          
     }
     
-    count++;
-    delay(10);
   }
   
   if ((maxBP - maxHP) > BP_threshold) {       //Indicates that the frequency is below 100-300Hz
@@ -345,16 +353,22 @@ int checkSound()
   }
            
   else {
-    return 0;
+    return 0;                                 //If there is no music, victory tune will proceed to play
   }
 
 }
 
 /*__________Check_Black_Strip__________*/
+//Checks for presence of black strip
+//Such that challenge will be detected
+//As long as one of the 2 IR detects the black strip
+//Challenge will be considered as detected.
+//This circumvents the case whereby the robot approaches the strip at an angle
+//and consequently only one of the IR sensors detects the black strip
 
 int checkStrip(){
   int sensorState = lineFinder.readSensors();
-  if (sensorState){
+  if (sensorState){             
     switch (sensorState){
         
       case S1_IN_S2_IN:
@@ -378,70 +392,71 @@ int checkStrip(){
 
 
 /*_____________Reads_Colour____________*/
+//Detects the intensity of reflected light for each color of LED, namely red, green and blue
+//Thereafter, the RGB values are calibrated with respect to calibration values 
+
 void readColor(float colorArr[]) {   //Reads Colour
   float whiteArr[3];
   float blackArr[3];
   float greyDiff[3];
 
-  whiteArr[0] = 563; //569, 566, 587
-  whiteArr[1] = 381; //447, 451, 480
-  whiteArr[2] = 437; //452, 463, 494
+  whiteArr[0] = 563;                //Calibration values based on null conditions whereby no color is shown
+  whiteArr[1] = 381; 
+  whiteArr[2] = 437; 
   blackArr[0] = 418;  
   blackArr[1] = 279;
   blackArr[2] = 322;
   
   int i;
-  for (i = 0; i < 3; i++) {
+  for (i = 0; i < 3; i++) {         //Acquires the calibrated range of RGB values that accounts for surrounding lighting.
     greyDiff[i] = whiteArr[i] - blackArr[i];
   }
 
-  //get color values
-  led.setColor(0, 255, 0, 0);
-  led.show();
-  delay(300);
-  colorArr[0] = ( (getAvr(7) - blackArr[0]) / greyDiff[0] ) * 255;
+  led.setColor(0, 255, 0, 0);       //For each color out of red, green and blue, the two embedded LEDs display the colour to determine intensity of reflected light. Last three parameters indicate the RGB value of light to be shone.
+  led.show();                       //LED will to emit light of the corresponding color 
+  delay(LDRWait);                       //To account for the response time of the LDR
+  colorArr[0] = ( (getAvr(7) - blackArr[0]) / greyDiff[0] ) * 255;  //The array will the contain the correctly calibrated RGB values.
   led.setColor(0, 0, 255, 0);
   led.show();
-  delay(300);
+  delay(LDRWait);
   colorArr[1] = ( (getAvr(7) - blackArr[1]) / greyDiff[1] ) * 255;
   led.setColor(0, 0, 0, 255);
   led.show();
-  delay(300);
+  delay(LDRWait);
   colorArr[2] = ( (getAvr(7) - blackArr[2]) / greyDiff[2] ) * 255;
-  led.setColor(0, 0, 0, 0);
+  led.setColor(0, 0, 0, 0);          //Turn off the LED.
   led.show();
 }
 
-//ChecksColour
+//The acquired RGB values are compared against one another to determine the color of the board.
 int checkColor(float colorArr[]) {
 
-  if (colorArr[0] < 20 && colorArr[1] < 20 && colorArr[2] < 20) { //if all values small, black
+  if (colorArr[0] < 20 && colorArr[1] < 20 && colorArr[2] < 20) {   //if all values small, black
     return 0;
   } 
   else {
-    if (colorArr[1] > colorArr[2] && colorArr[1] > colorArr[0]) {//if green highest, green
+    if (colorArr[1] > colorArr[2] && colorArr[1] > colorArr[0]) {   //if green highest, green
       return RIGHT_90;
     }
 
-  if (colorArr[0] > colorArr[1] && colorArr[0] > colorArr[2]) { //if red is highest value,
-    if (abs(colorArr[1] - colorArr[2]) < 11) {                  //if green and blue similiar, red
+  if (colorArr[0] > colorArr[1] && colorArr[0] > colorArr[2]) {     //if red is highest value,
+    if (abs(colorArr[1] - colorArr[2]) < 11) {                      //if green and blue similiar, red
         return LEFT_90;
       } 
-    else {                                //if not, yellow
+    else {                                                          //if not, yellow
         return ABOUTTURN;
       }
     }
 
-   if (colorArr[2] > colorArr[1] && colorArr[2] > colorArr[0]) { //if blue is highest
+   if (colorArr[2] > colorArr[1] && colorArr[2] > colorArr[0]) {   //if blue is highest
      if (colorArr[0] > colorArr[1]) {                              //if red higher than green, purple
        return UTURN_LEFT;
       }
-      if (colorArr[1] > colorArr[0]) {                           //if green higher than red, light blue
+      if (colorArr[1] > colorArr[0]) {                             //if green higher than red, light blue
         return UTURN_RIGHT;
       }
     }
   }
-  delay(200);
 }
 
 /*play music once the maxe has ended*/
@@ -459,21 +474,22 @@ void playVictory(){
 /*____________Miscellaneous__Functions_____________*/
         
 //Gets average reading for the light sensor
-        
+//Such that RGB values used are more reliable
  int getAvr(int times) {
   int i;
   int sum = 0;
   int reading;
   int avr;
-  for (i = 0; i < times; i++) {
-    reading = lightSensor.read();
+  for (i = 0; i < times; i++) {             
+    reading = lightSensor.read();       
     sum = sum + reading;
   }
   avr = sum / i;
   return avr;
 }
         
-//Colour calibration     
+//Colour calibration to acquire RGB values of white and black
+//Under room lighting condition
 /*void colorCalibrate() {
   int i;
   Serial.println("White calibration...");
