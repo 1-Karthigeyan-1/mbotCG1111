@@ -412,38 +412,31 @@ void readColor(float colorArr[]) {   //Reads Colour
   led.show();
 }
 
+//ChecksColour
+int checkColor(float colorArr[]) {
 
-int checkColor(float colorArr[]) {//Checks colour
-  Serial.println("Checking color");
-  Serial.println(colorArr[0]);
-  Serial.println(colorArr[1]);
-  Serial.println(colorArr[2]);
   if (colorArr[0] < 20 && colorArr[1] < 20 && colorArr[2] < 20) { //if all values small, black
-    Serial.println("black");
     return 0;
-  } else {
+  } 
+  else {
     if (colorArr[1] > colorArr[2] && colorArr[1] > colorArr[0]) {//if green highest, green
-      Serial.println("green");
       return RIGHT_90;
     }
 
-    if (colorArr[0] > colorArr[1] && colorArr[0] > colorArr[2]) { //if red is highest value,
-      if (abs(colorArr[1] - colorArr[2]) < 11) {                  //if green and blue similiar, red
-        Serial.println("red");
+  if (colorArr[0] > colorArr[1] && colorArr[0] > colorArr[2]) { //if red is highest value,
+    if (abs(colorArr[1] - colorArr[2]) < 11) {                  //if green and blue similiar, red
         return LEFT_90;
-      } else {
-        Serial.println("yellow");                                //if not, yellow
+      } 
+    else {                                //if not, yellow
         return ABOUTTURN;
       }
     }
 
-    if (colorArr[2] > colorArr[1] && colorArr[2] > colorArr[0]) { //if blue is highest
-      if (colorArr[0] > colorArr[1]) {
-        Serial.println("purple");                                //if red higher than green, purple
-        return UTURN_LEFT;
+   if (colorArr[2] > colorArr[1] && colorArr[2] > colorArr[0]) { //if blue is highest
+     if (colorArr[0] > colorArr[1]) {                              //if red higher than green, purple
+       return UTURN_LEFT;
       }
       if (colorArr[1] > colorArr[0]) {                           //if green higher than red, light blue
-        Serial.println("light blue");
         return UTURN_RIGHT;
       }
     }
@@ -451,7 +444,8 @@ int checkColor(float colorArr[]) {//Checks colour
   delay(200);
 }
 
- void playVictory(){
+/*play music once the maxe has ended*/
+void playVictory(){
   int noteDuration,pauseBetweenNotes;
   for (int thisNote = 0; thisNote < 112; thisNote++){
     noteDuration = 1000/noteDurations[thisNote];
@@ -460,22 +454,11 @@ int checkColor(float colorArr[]) {//Checks colour
     delay(pauseBetweenNotes);
     buzzer.noTone();
   }
-}
-void loo       
+}       
         
+/*____________Miscellaneous__Functions_____________*/
         
-int getAvgReading(int times) {
-  int reading;
-  int total = 0;
-  for (int i = 0; i < times; i++) {
-    reading = lightSensor.read();
-    total = reading + total;
-    delay(LDRWait);
-  }
-  //calculate the average and return it
-  return total / times;
-}
-
+//Gets average reading for the light sensor
         
  int getAvr(int times) {
   int i;
@@ -490,7 +473,7 @@ int getAvgReading(int times) {
   return avr;
 }
         
-        
+//Colour calibration     
 /*void colorCalibrate() {
   int i;
   Serial.println("White calibration...");
