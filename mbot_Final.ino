@@ -1,34 +1,20 @@
- 
-  
-/*************************************
-  Progress Tracker:
-  1. Skeleton code
-  2. Movement direction 3/5
-  Find your functions are code on a seperate file your function
-  with the appropriate return values
-**************************************/
+//Libraries Used.
+#include <MeMCore.h> 
 
-
-#include <MeMCore.h>
-
-//#define MICBP 2    //Define sound : bandpass 
-//#define MICHP 3    //Define sound: highpass
-
-//Define robot states
-#define LEFT_90 1
-#define RIGHT_90 2
-#define ABOUTTURN 3
-#define UTURN_LEFT 4
-#define UTURN_RIGHT 5
-#define REORIENTATE -1
-#define STOP 0
-#define STRAIGHT 6
-#define LEFT_ADJUST 7
-#define RIGHT_ADJUST 8
-#define BACK 10
+//Define Movement States
+#define LEFT_90 1                 //90 degree left turn
+#define RIGHT_90 2                //90 degree right turn 
+#define ABOUTTURN 3               //180 degree turn on the spot
+#define UTURN_LEFT 4              //Uturns by using 2 left 90-degree turns over 2 grids
+#define UTURN_RIGHT 5             //Uturns by using 2 right 90-degree turns over 2 grids
+#define STOP 0                    // Stops moving
+#define STRAIGHT 6                //Moves straight
+#define LEFT_ADJUST 7             //Adjust to the left side in a straight pathway
+#define RIGHT_ADJUST 8            //Adjust to the right side in a straight pathway
+#define BACK 10                   //Move backwards
 
 //Miscellaneous definitions
-#define USDIST 6
+#define USDIST 6                  
 #define TIME 630 //625rt
 #define LDRWait 100
 #define IRLEFT 15.7
