@@ -80,8 +80,8 @@ MeBuzzer buzzer;                          //Speaker Port
 /*________Function Prototypes_________*/
 void executeRobot(float [], int);        
 void movement(int);                       
-void movement_uturn_right();
-void movement_uturn_left();
+void movement_uturn_right(int);
+void movement_uturn_left(int);
 void movement_straight_nc(); 
 int check_side(); 
 int checkChallenge();                  
@@ -140,15 +140,15 @@ void executeRobot(int Victory){
 //to execute movement of the robot.
 
 void movement(int state){
-  int time = millis();                  //Set int time to current run time of the code 
-  switch (state){                       //Executes different movements depending on predefined constants in function parameter
+  int t = millis();                    //Set int t to current run time of the code 
+  switch (state){                      //Executes different movements depending on predefined constants in function parameter
     
     //Turn left 90 degress
     case LEFT_90:                       
       do{
         motor1.run(100);
         motor2.run(100);
-      }while((millis() - time) <= TIME);  //To ensure that the time taken for the turn is as precise as possible. 
+      }while((millis() - t) <= TIME);  //To ensure that the time taken for the turn is as precise as possible. 
       break;
     
     //Turn Right 90 degrees
@@ -156,7 +156,7 @@ void movement(int state){
       do{
         motor1.run(-100);
         motor2.run(-100);
-      }while((millis() - time) <= TIME);
+      }while((millis() - t) <= TIME);
       break;
       
     //Turns 180 degrees on the spot  
@@ -164,7 +164,7 @@ void movement(int state){
       do{
         motor1.run(200);                  //The robot executes an about turn by doubling motor speed of turn for the same amount of time.
         motor2.run(200);
-      }while((millis() - time) <= TIME);
+      }while((millis() - t) <= TIME);
       break;
       
     //Stop
@@ -175,12 +175,12 @@ void movement(int state){
     
     //2 successive left turns over 2 grids    
     case UTURN_LEFT:
-      movement_uturn_left();             //Called upon as a secondary function due to relative complexity of the code
+      movement_uturn_left(t);             //Called upon as a secondary function due to relative complexity of the code
       break;
         
     //2 successive right turns over 2 grids 
     case UTURN_RIGHT: 
-      movement_uturn_right();
+      movement_uturn_right(t);
       break;
         
     //Moves straight  
@@ -206,10 +206,10 @@ void movement(int state){
   
 
 //Does 2 successive 90 degree right turns over 2 grids        
-void movement_uturn_right() {
+void movement_uturn_right(int t) {
   do{
     movement(RIGHT_90);                               //Executes the first turn
-  }while((millis() - time) <= 20);                    
+  }while((millis() - t) <= 20);                    
     movement(STOP);                             
   while (ultraSensor.distanceCm() > USDIST) {         //While distance between mBOT and the wall is greater than threshold value
     motor1.run(-100);                                 //mBOT will move straight towards the front wall
@@ -220,16 +220,16 @@ void movement_uturn_right() {
   
   do{                                                 //mBOT executes the second right turn. Thereafter, the next iteration of the executeRobot() will be called upon and it will move straight.
     movement(RIGHT_90);         
-  }while((millis() - time) <= 20);
+  }while((millis() - t) <= 20);
   
 }
 
 
 //Does 2 successive 90 degree leftturns over 2 grids        
-void movement_uturn_left() {
+void movement_uturn_left(int t) {
   do{
     movement(LEFT_90);
-  }while((millis() - time) <= 20);
+  }while((millis() - t) <= 20);
     movement(STOP);
   
   while (ultraSensor.distanceCm() > USDIST) {       //Detects for wall
@@ -241,15 +241,15 @@ void movement_uturn_left() {
   
   do{
     movement(LEFT_90);
-  }while((millis() - time) <= 20);
+  }while((millis() - t) <= 20);
 }
 
 
 //mBOT moves straight while checking for strip to execute checkChallenge()
 //If black strip is detected, while loop is terminated 
 void movement_straight_nc() {  
-  while(checkStrip() != 1){                   //checks for black strips along the way.
-     movement(check_side());                  //Chwcks the sides and adjust accordingly
+  while(checkStrip() != 1){                   //Checks for black strips along the way.
+     movement(check_side());                  //Checks the sides and adjust accordingly
      delay(25);
   }
 }
@@ -327,9 +327,9 @@ int checkSound()
   float valHP;                        //Highpass value
   float maxBP = 0, maxHP = 0;         
   float diff = 0;
-  int time = millis();
+  int t = millis();
 
-  while (millis() - time < 3000) {            //Run for around 3 seconds to sample at least the whole duration of one song cycle of each song
+  while (millis() - t < 3000) {               //Run for around 3 seconds to sample at least the whole duration of one song cycle of each song
     
     valBP = Sound.aRead1()/ 1023.0 * 5;       //Get band pass values  
     valHP = Sound.aRead2()/ 1023.0 * 5;       //Get high pass values
@@ -414,7 +414,7 @@ void readColor(float colorArr[]) {   //Reads Colour
 
   led.setColor(0, 255, 0, 0);       //For each color out of red, green and blue, the two embedded LEDs display the colour to determine intensity of reflected light. Last three parameters indicate the RGB value of light to be shone.
   led.show();                       //LED will to emit light of the corresponding color 
-  delay(LDRWait);                       //To account for the response time of the LDR
+  delay(LDRWait);                   //To account for the response time of the LDR
   colorArr[0] = ( (getAvr(7) - blackArr[0]) / greyDiff[0] ) * 255;  //The array will the contain the correctly calibrated RGB values.
   led.setColor(0, 0, 255, 0);
   led.show();
@@ -541,4 +541,4 @@ void playVictory(){
 
   
 
-loop(){}
+void loop(){}
