@@ -341,6 +341,7 @@ int checkSound()
     if (valHP > maxHP) {                      //Finds the maximum highpass value
       maxHP = valHP;                          
     }
+    delayMicroseconds(125);                   //Period of each sampling iteration is 125 microseconds such that Nyquist rate is 8000 Hz.
     
   }
   
